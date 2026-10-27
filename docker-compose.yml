@@ -1,0 +1,37 @@
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: smart_calendar_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - smart_calendar_net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smart_calendar_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb://mongo:27017
+      - DATABASE_NAME=smart_calendar
+      - TIMEZONE=America/Sao_Paulo
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - mongo
+    networks:
+      - smart_calendar_net
+
+volumes:
+  mongo_data:
+
+networks:
+  smart_calendar_net:
+    driver: bridge
