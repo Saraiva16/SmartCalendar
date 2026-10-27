@@ -2,6 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { WhiteboardCanvas } from '../components/WhiteboardCanvas';
 import { useUIStore } from '../stores/useUIStore';
 
+interface CalendarEvent {
+  event_id: string;
+  title: string;
+  start_time: string;
+  end_time: string;
+  date_key: string;
+  color?: string;
+}
+
 interface DayColumn {
   name: string;
   shortName: string;
@@ -13,6 +22,26 @@ interface DayColumn {
 export const WeeklyView: React.FC = () => {
   const { setSelectedDateForDaily, setViewMode } = useUIStore();
   const [days, setDays] = useState<DayColumn[]>([]);
+  const [events, setEvents] = useState<Record<string, CalendarEvent[]>>({});
+
+  // Carrega eventos da agenda do Google
+  useEffect(() => {
+    if (days.length === 0) return;
+    const start = days[0].dateKey;
+    const end = days[days.length - 1].dateKey;
+
+    fetch(`http://localhost:8000/api/v1/google/events?start_date=${start}&end_date=${end}`)
+      .then((res) => res.json())
+      .then((data: CalendarEvent[]) => {
+        const grouped: Record<string, CalendarEvent[]> = {};
+        data.forEach((evt) => {
+          if (!grouped[evt.date_key]) grouped[evt.date_key] = [];
+          grouped[evt.date_key].push(evt);
+        });
+        setEvents(grouped);
+      })
+      .catch(() => {});
+  }, [days]);
 
   // Calcula os dias da semana corrente iniciando na SEGUNDA-FEIRA
   useEffect(() => {
@@ -89,6 +118,23 @@ export const WeeklyView: React.FC = () => {
               {day.displayDate}
             </span>
           </div>
+
+          {/* Bloco de Eventos do Google Calendar (Zona de altura controlada) */}
+          {events[day.dateKey] && events[day.dateKey].length > 0 && (
+            <div className="px-2 py-1.5 bg-slate-50 border-b border-slate-100 space-y-1 max-h-24 overflow-y-auto">
+              {events[day.dateKey].map((evt) => (
+                <div
+                  key={evt.event_id}
+                  className="px-1.5 py-0.5 rounded text-[10px] font-semibold truncate flex items-center gap-1 text-white shadow-2xs"
+                  style={{ backgroundColor: evt.color || '#3B82F6' }}
+                  title={`${evt.start_time} - ${evt.title}`}
+                >
+                  <span className="opacity-80">{evt.start_time}</span>
+                  <span className="truncate">{evt.title}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Superfície do Canvas Independente do Dia */}
           <div className="flex-1 relative">
