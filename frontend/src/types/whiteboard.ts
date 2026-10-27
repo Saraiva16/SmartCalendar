@@ -38,3 +38,4 @@ export interface DayData {
 
 export type ViewMode = 'WEEKLY' | 'DAILY' | 'MONTHLY';
 export type ToolMode = 'pen' | 'eraser';
+

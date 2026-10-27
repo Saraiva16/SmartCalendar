@@ -73,3 +73,4 @@ export function getSvgPathFromStroke(strokePoints: number[][]): Path2D {
 
   return path;
 }
+

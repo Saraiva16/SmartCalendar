@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { WhiteboardCanvas } from '../components/WhiteboardCanvas';
 import { useUIStore } from '../stores/useUIStore';
 import { db } from '../services/dexie';
+import { syncService } from '../services/syncService';
 import type { TodoItem } from '../types/whiteboard';
 import { Plus, Check, Trash2 } from 'lucide-react';
 
@@ -12,6 +13,7 @@ export const DailyView: React.FC = () => {
 
   // 1. Carregar tarefas do Dexie
   const loadTodos = async () => {
+    await syncService.pullDayData(selectedDateForDaily);
     const list = await db.todos
       .where('date_key')
       .equals(selectedDateForDaily)
@@ -36,6 +38,7 @@ export const DailyView: React.FC = () => {
       completed_at: updated ? new Date().toISOString() : null,
       is_synced: false,
     });
+    syncService.scheduleSync(selectedDateForDaily);
     loadTodos();
   };
 
@@ -53,6 +56,7 @@ export const DailyView: React.FC = () => {
     };
     await db.todos.put(newTodo);
     setNewTodoTitle('');
+    syncService.scheduleSync(selectedDateForDaily);
     loadTodos();
   };
 
@@ -62,6 +66,11 @@ export const DailyView: React.FC = () => {
     // Limpa os traços que estavam vinculados a esse todo
     const strokes = await db.strokes.where('todo_id').equals(todoId).toArray();
     await Promise.all(strokes.map((s) => db.strokes.delete(s.stroke_id)));
+
+    fetch(`http://localhost:8000/api/v1/days/${selectedDateForDaily}/todos/${todoId}`, {
+      method: 'DELETE',
+    }).catch(() => {});
+
     loadTodos();
   };
 
@@ -179,3 +188,4 @@ export const DailyView: React.FC = () => {
     </div>
   );
 };
+

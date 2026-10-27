@@ -25,3 +25,4 @@ export class SmartCalendarDB extends Dexie {
 }
 
 export const db = new SmartCalendarDB();
+

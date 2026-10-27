@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import getStroke from 'perfect-freehand';
 import { db } from '../services/dexie';
+import { syncService } from '../services/syncService';
 import { useUIStore } from '../stores/useUIStore';
 import type { ContainerType, Point, Stroke } from '../types/whiteboard';
 import {
@@ -181,6 +182,13 @@ export const WhiteboardCanvas: React.FC<WhiteboardCanvasProps> = ({
     if (strokesToDelete.length > 0) {
       setConfirmedStrokes(remainingStrokes);
       await Promise.all(strokesToDelete.map((id) => db.strokes.delete(id)));
+
+      // Remove no backend
+      for (const id of strokesToDelete) {
+        fetch(`http://localhost:8000/api/v1/days/${dateKey}/strokes/${id}`, {
+          method: 'DELETE',
+        }).catch(() => {});
+      }
     }
   };
 
@@ -245,6 +253,9 @@ export const WhiteboardCanvas: React.FC<WhiteboardCanvasProps> = ({
       await db.strokes.put(newStroke);
       setConfirmedStrokes((prev) => [...prev, newStroke]);
       setCurrentVirtualPoints([]);
+
+      // Dispara sincronização com debounce para o backend
+      syncService.scheduleSync(dateKey);
     }
   };
 

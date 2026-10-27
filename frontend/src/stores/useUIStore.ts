@@ -41,3 +41,4 @@ export const useUIStore = create<UIState>((set) => ({
   setPenSize: (penSize) => set({ penSize }),
   setSelectedDateForDaily: (selectedDateForDaily) => set({ selectedDateForDaily }),
 }));
+

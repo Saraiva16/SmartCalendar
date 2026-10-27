@@ -176,3 +176,4 @@ export const MonthlyView: React.FC = () => {
     </div>
   );
 };
+
