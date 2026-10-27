@@ -96,3 +96,4 @@ class RolloverService:
             "migrated_todos": len(migrated_todos),
             "migrated_strokes": len(migrated_strokes)
         }
+

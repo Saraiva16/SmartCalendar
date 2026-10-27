@@ -28,3 +28,4 @@ async def get_tasks(
     google_service: IGoogleIntegrationService = Depends(get_google_service)
 ):
     return await google_service.get_tasks()
+

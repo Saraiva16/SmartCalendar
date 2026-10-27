@@ -18,3 +18,4 @@ async def trigger_rollover(
 ):
     service = RolloverService(repository=repo)
     return await service.execute_rollover(user_id=user_id, target_date_key=target_date_key)
+

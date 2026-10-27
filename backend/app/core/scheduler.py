@@ -27,3 +27,4 @@ def stop_scheduler():
     if scheduler.running:
         scheduler.shutdown()
         print("[APScheduler] Scheduler encerrado")
+

@@ -44,3 +44,4 @@ class GoogleIntegrationService(IGoogleIntegrationService):
     async def update_task_status(self, task_id: str, completed: bool) -> bool:
         print(f"[GoogleTasks] Tarefa {task_id} atualizada para completed={completed}")
         return True
+

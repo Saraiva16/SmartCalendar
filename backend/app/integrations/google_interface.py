@@ -33,3 +33,4 @@ class IGoogleIntegrationService(ABC):
     async def update_task_status(self, task_id: str, completed: bool) -> bool:
         """Atualiza o status de conclusão de uma tarefa no Google Tasks."""
         pass
+
