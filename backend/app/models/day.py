@@ -49,3 +49,4 @@ class Day(Document):
         indexes = [
             [("user_id", 1), ("date_key", 1)],  # Chave composta
         ]
+

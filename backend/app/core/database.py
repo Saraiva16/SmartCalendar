@@ -18,3 +18,4 @@ async def init_db() -> None:
 async def close_db() -> None:
     if db.client:
         db.client.close()
+
