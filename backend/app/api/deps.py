@@ -3,15 +3,21 @@ from app.core.config import settings
 from app.repositories.day_repository_interface import IDayRepository
 from app.repositories.mongo_day_repository import MongoDayRepository
 from app.services.day_service import DayService
+from app.integrations.google_interface import IGoogleIntegrationService
+from app.integrations.google_service import GoogleIntegrationService
 
 # Injeção singleton do repositório
 _day_repository: IDayRepository = MongoDayRepository()
+_google_service: IGoogleIntegrationService = GoogleIntegrationService()
 
 def get_day_repository() -> IDayRepository:
     return _day_repository
 
 def get_day_service() -> DayService:
     return DayService(repository=get_day_repository())
+
+def get_google_service() -> IGoogleIntegrationService:
+    return _google_service
 
 def get_current_user_id(x_user_id: str = Header(default=None)) -> str:
     """Extrai o user_id do cabeçalho HTTP ou recorre ao usuário padrão configurado."""
