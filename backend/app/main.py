@@ -3,17 +3,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import init_db, close_db
+from app.core.scheduler import start_scheduler, stop_scheduler
 from app.api.v1.api import api_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Inicialização do Beanie / Mongo
+    # Startup: Inicialização do Beanie / Mongo e APScheduler
     try:
         await init_db()
+        start_scheduler()
     except Exception as e:
-        print(f"[WARN] MongoDB connection deferred or offline: {e}")
+        print(f"[WARN] Database or Scheduler init deferred: {e}")
     yield
     # Shutdown
+    stop_scheduler()
     await close_db()
 
 app = FastAPI(
